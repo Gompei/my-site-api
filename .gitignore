@@ -4,6 +4,10 @@
 ### Jetbrains ###
 .idea
 
+### lambda ###
+handler
+*.zip
+
 ### Go ###
 # Binaries for programs and plugins
 *.exe
