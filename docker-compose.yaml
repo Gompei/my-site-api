@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  lambda:
+    container_name: lambda
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ~/.aws-lambda-rie:/aws-lambda
+    entrypoint: "/aws-lambda/aws-lambda-rie"
+    command: "/main"
+    ports:
+      - "9000:8080"
+    depends_on:
+      - dynamodb
+
+  dynamodb:
+    container_name: dynamodb
+    image: amazon/dynamodb-local:latest
+    user: root
+    command: -jar DynamoDBLocal.jar -sharedDb -dbPath /data
+    volumes:
+      - dynamodb-data:/data
+    ports:
+      - 8000:8000
+
+  dynamodb-admin:
+    container_name: dynamodb-admin
+    image: aaronshaf/dynamodb-admin:latest
+    environment:
+      - DYNAMO_ENDPOINT=dynamodb:8000
+    ports:
+      - 8001:8001
+    depends_on:
+      - dynamodb
+
+volumes:
+  dynamodb-data:
