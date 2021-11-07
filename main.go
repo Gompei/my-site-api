@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	lambda.Start(handler.Router)
+	lambda.Start(handler.Handler)
 }

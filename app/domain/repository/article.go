@@ -5,7 +5,8 @@ import (
 )
 
 type Article interface {
-	GetArticle(article *object.Article) (*object.Article, error)
+	GetAllArticle() ([]*object.Article, error)
+	GetArticle(id int64) (*object.Article, error)
 	PutArticle(article *object.Article) error
 	DeleteArticle(article *object.Article) error
 }
