@@ -12,6 +12,10 @@ services:
     command: "/main"
     ports:
       - "9000:8080"
+    environment:
+      DISABLE_SSL_FLG: "true"
+      REGION: "us-east-1"
+      Endpoint: "http://docker.for.mac.localhost:8000"
     depends_on:
       - dynamodb
 
