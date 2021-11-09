@@ -3,12 +3,10 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/Gompei/my-site-api/app/dao"
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambdacontext"
 )
 
 type App struct {
@@ -33,9 +31,6 @@ var (
 //}
 
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	lc, _ := lambdacontext.FromContext(ctx)
-	log.Println(lc)
-	log.Println(request)
 	//headers := map[string]string{
 	//	"Content-Type":                    "application/json",
 	//	"Access-Control-Allow-Origin":     request.Headers["origin"],
