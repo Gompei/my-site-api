@@ -11,14 +11,8 @@ import (
 )
 
 const (
-	articleHeadlineTableName             = "article_headline_table"
-	articleHeadlineTablePartitionKeyName = "service_name"
-	articleHeadlinePartitionKeyValue     = "my_site"
-)
-
-const (
-	articleContentTableName             = "article_content_table"
-	articleContentTablePartitionKeyName = "article_id"
+	tableName        = "article_table"
+	partitionKeyName = "article_id"
 )
 
 type Article struct {
@@ -63,27 +57,13 @@ func NewArticle(db *dynamodb.DynamoDB) repository.Article {
 
 // PutArticle　記事データを登録します
 func (r *Article) PutArticle(ctx context.Context, article *object.Article) error {
-	// 記事見出し登録
-	av, err := dynamodbattribute.MarshalMap(article.Headline)
+	av, err := dynamodbattribute.MarshalMap(article)
 	if err != nil {
 		return err
 	}
-	_, err = r.db.PutItemWithContext(ctx, &dynamodb.PutItemInput{
-		TableName: aws.String(articleHeadlineTableName),
-		Item:      av,
 
-		ReturnConsumedCapacity:      aws.String("NONE"),
-		ReturnItemCollectionMetrics: aws.String("NONE"),
-		ReturnValues:                aws.String("NONE"),
-	})
-
-	// 記事内容登録
-	av, err = dynamodbattribute.MarshalMap(article.Content)
-	if err != nil {
-		return err
-	}
 	_, err = r.db.PutItemWithContext(ctx, &dynamodb.PutItemInput{
-		TableName: aws.String(articleContentTableName),
+		TableName: aws.String(tableName),
 		Item:      av,
 
 		ReturnConsumedCapacity:      aws.String("NONE"),

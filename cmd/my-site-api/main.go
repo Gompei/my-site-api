@@ -43,25 +43,17 @@ func run() (map[string]interface{}, error) {
 	}
 
 	article := object.Article{
-		Headline: object.ArticleHeadline{
-			ID:               1,
-			Title:            "example",
-			SubTitle:         "example",
-			ImageURL:         "example",
-			CategoryTag:      "example",
-			Description:      "example",
-			NumberOfAccesses: 100,
-			CreateTimeStamp:  pkg.CreateTimeStamp(),
-			UpdateTimeStamp:  pkg.CreateTimeStamp(),
-			DeleteFlg:        false,
-		},
-		Content: object.ArticleContent{
-			ID:              1,
-			Content:         "example",
-			CreateTimeStamp: pkg.CreateTimeStamp(),
-			UpdateTimeStamp: pkg.CreateTimeStamp(),
-			DeleteFlg:       false,
-		},
+		ID:               1,
+		Title:            "example",
+		SubTitle:         "example",
+		ImageURL:         "example",
+		CategoryTag:      "example",
+		Description:      "example",
+		NumberOfAccesses: 100,
+		Content:          "example",
+		CreateTimeStamp:  pkg.CreateTimeStamp(),
+		UpdateTimeStamp:  pkg.CreateTimeStamp(),
+		DeleteFlg:        false,
 	}
 	j, err := pkg.InterfaceToJson(article)
 	if err != nil {
