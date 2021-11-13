@@ -15,9 +15,19 @@ func NewDynamo() (*dynamodb.DynamoDB, error) {
 		return nil, err
 	}
 
+	region := os.Getenv("REGION")
+	if region == "" {
+		region = "us-east-1"
+	}
+
+	endpoint := os.Getenv("ENDPOINT")
+	if endpoint == "" {
+		endpoint = "http://docker.for.mac.localhost:8000"
+	}
+
 	return dynamodb.New(session.Must(session.NewSession(&aws.Config{
-		Region:     aws.String(os.Getenv("REGION")),
-		Endpoint:   aws.String(os.Getenv("ENDPOINT")),
+		Region:     aws.String(region),
+		Endpoint:   aws.String(endpoint),
 		DisableSSL: aws.Bool(disableSSLFlg),
 	}))), nil
 }

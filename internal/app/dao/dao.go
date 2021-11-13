@@ -18,6 +18,7 @@ func New() (Dao, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return &dao{
 		db: db,
 	}, nil
