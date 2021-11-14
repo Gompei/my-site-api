@@ -7,7 +7,6 @@
 .idea
 
 ### lambda ###
-handler
 *.zip
 
 ### Go ###

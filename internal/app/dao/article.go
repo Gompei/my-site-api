@@ -24,6 +24,7 @@ func NewArticle(db *dynamodb.DynamoDB) repository.Article {
 	return &Article{db: db}
 }
 
+// ListArticles　記事データを全件取得します
 func (r *Article) ListArticles(ctx context.Context) ([]*object.Article, error) {
 	scanOut, err := r.db.ScanWithContext(ctx, &dynamodb.ScanInput{
 		TableName:            aws.String(tableName),
