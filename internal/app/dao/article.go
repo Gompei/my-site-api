@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	tableName        = "article_table"
-	partitionKeyName = "article_id"
+	tableName                = "article_table"
+	partitionKey             = "article_id"
+	listProjectionExpression = "id,title,sub_title,image_url,category_tag,description,create_time_stamp,update_time_stamp"
 )
 
 type Article struct {
@@ -23,39 +24,49 @@ func NewArticle(db *dynamodb.DynamoDB) repository.Article {
 	return &Article{db: db}
 }
 
-//
-//func FindArticleHeadlines() {}
-//
-//func ListArticleHeadlines() {}
-//
-//func GetArticleHeadlines() {}
-//
-//// GetArticle 記事IDを元に、記事データを検索して返却します
-//func (r *Article) GetArticle(ctx context.Context, id int64) (*object.Article, error) {
-//	i := strconv.FormatInt(id, 10)
-//
-//	// 記事見出し取得
-//
-//	// 記事内容
-//	result, err := r.db.GetItemWithContext(ctx, &dynamodb.GetItemInput{
-//		TableName: aws.String(articleContentTableName),
-//		Key: map[string]*dynamodb.AttributeValue{
-//			articleContentTablePartitionKeyName: {
-//				N: aws.String(i),
-//			},
-//		},
-//	})
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	articleContent := &object.ArticleContent{}
-//	err = dynamodbattribute.UnmarshalMap(result.Item, articleContent)
-//
-//	return article, err
-//}
+func (r *Article) ListArticles(ctx context.Context) ([]*object.Article, error) {
+	scanOut, err := r.db.ScanWithContext(ctx, &dynamodb.ScanInput{
+		TableName:            aws.String(tableName),
+		ProjectionExpression: aws.String(listProjectionExpression),
+	})
+	if err != nil {
+		return nil, err
+	}
 
-// PutArticle　記事データを登録します
+	var articles []*object.Article
+	for _, s := range scanOut.Items {
+		var article *object.Article
+		err = dynamodbattribute.UnmarshalMap(s, &article)
+		if err != nil {
+			return nil, err
+		}
+		articles = append(articles, article)
+	}
+
+	return articles, nil
+}
+
+// GetArticle 記事IDを元に、記事データを検索して返却します
+func (r *Article) GetArticle(ctx context.Context, id string) (*object.Article, error) {
+	result, err := r.db.GetItemWithContext(ctx, &dynamodb.GetItemInput{
+		TableName: aws.String(tableName),
+		Key: map[string]*dynamodb.AttributeValue{
+			partitionKey: {
+				N: aws.String(id),
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var article *object.Article
+	err = dynamodbattribute.UnmarshalMap(result.Item, article)
+
+	return article, err
+}
+
+// PutArticle　記事データを登録・更新します
 func (r *Article) PutArticle(ctx context.Context, article *object.Article) error {
 	av, err := dynamodbattribute.MarshalMap(article)
 	if err != nil {
@@ -75,24 +86,19 @@ func (r *Article) PutArticle(ctx context.Context, article *object.Article) error
 }
 
 // DeleteArticle　記事IDを元に、記事データを削除します(物理削除)
-//func (r *Article) DeleteArticle(ctx context.Context, id int64) error {
-//	i := strconv.FormatInt(id, 10)
-//
-//	// 記事見出し削除
-//
-//	// 記事内容削除
-//	_, err := r.db.DeleteItemWithContext(ctx, &dynamodb.DeleteItemInput{
-//		TableName: aws.String(articleContentTableName),
-//		Key: map[string]*dynamodb.AttributeValue{
-//			articleContentTablePartitionKeyName: {
-//				S: aws.String(i),
-//			},
-//		},
-//
-//		ReturnConsumedCapacity:      aws.String("NONE"),
-//		ReturnItemCollectionMetrics: aws.String("NONE"),
-//		ReturnValues:                aws.String("NONE"),
-//	})
-//
-//	return err
-//}
+func (r *Article) DeleteArticle(ctx context.Context, id string) error {
+	_, err := r.db.DeleteItemWithContext(ctx, &dynamodb.DeleteItemInput{
+		TableName: aws.String(tableName),
+		Key: map[string]*dynamodb.AttributeValue{
+			partitionKey: {
+				N: aws.String(id),
+			},
+		},
+
+		ReturnConsumedCapacity:      aws.String("NONE"),
+		ReturnItemCollectionMetrics: aws.String("NONE"),
+		ReturnValues:                aws.String("NONE"),
+	})
+
+	return err
+}

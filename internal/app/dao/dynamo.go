@@ -22,7 +22,7 @@ func NewDynamo() (*dynamodb.DynamoDB, error) {
 
 	endpoint := os.Getenv("ENDPOINT")
 	if endpoint == "" {
-		endpoint = "http://docker.for.mac.localhost:8000"
+		endpoint = "http://127.0.0.1:8000"
 	}
 
 	return dynamodb.New(session.Must(session.NewSession(&aws.Config{

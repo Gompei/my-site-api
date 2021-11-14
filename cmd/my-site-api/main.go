@@ -6,12 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Gompei/my-site-api/pkg"
-
 	"github.com/Gompei/my-site-api/internal/app/domain/object"
-
 	"github.com/Gompei/my-site-api/internal/app/handler"
-
+	"github.com/Gompei/my-site-api/pkg"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
@@ -32,28 +29,27 @@ func run() (map[string]interface{}, error) {
 	ctx := context.Background()
 	event := events.APIGatewayProxyRequest{
 		Resource: "/api",
-		Path:     "/api",
+		Path:     "/api/article/list",
 		Headers: map[string]string{
 			"Host":      "example.com",
 			"x-api-key": "abc",
 		},
-		QueryStringParameters: map[string]string{
-			"limit": "10",
+		PathParameters: map[string]string{
+			"articleID": "111",
 		},
 	}
 
 	article := object.Article{
-		ID:               1,
-		Title:            "example",
-		SubTitle:         "example",
-		ImageURL:         "example",
-		CategoryTag:      "example",
-		Description:      "example",
-		NumberOfAccesses: 100,
-		Content:          "example",
-		CreateTimeStamp:  pkg.CreateTimeStamp(),
-		UpdateTimeStamp:  pkg.CreateTimeStamp(),
-		DeleteFlg:        false,
+		ID:              1,
+		Title:           "example",
+		SubTitle:        "example",
+		ImageURL:        "example",
+		CategoryTag:     "example",
+		Description:     "example",
+		Content:         "example",
+		CreateTimeStamp: pkg.CreateTimeStamp(),
+		UpdateTimeStamp: pkg.CreateTimeStamp(),
+		DeleteFlg:       false,
 	}
 	j, err := pkg.InterfaceToJson(article)
 	if err != nil {
@@ -62,7 +58,7 @@ func run() (map[string]interface{}, error) {
 	event.Body = j
 
 	//httpMethods := []string{"GET", "POST", "PUT", "DELETE"}
-	httpMethods := []string{"POST"}
+	httpMethods := []string{"GET"}
 	result := make(map[string]interface{}, len(httpMethods))
 	for _, httpMethod := range httpMethods {
 		event.HTTPMethod = httpMethod

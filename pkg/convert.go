@@ -3,7 +3,13 @@ package pkg
 import (
 	"encoding/json"
 	"reflect"
+	"time"
 )
+
+func StringToTime(str string) (time.Time, error) {
+	t, err := time.Parse(time.RFC3339, str)
+	return t, err
+}
 
 func InterfaceToJson(i interface{}) (string, error) {
 	j, err := json.Marshal(i)
@@ -28,15 +34,3 @@ func MapToStruct(m map[string]interface{}, i interface{}) interface{} {
 	}
 	return i
 }
-
-//func MapToStruct(m map[string]interface{}, i interface{}) (interface{}, error) {
-//	j, err := json.Marshal(m)
-//	if err != nil {
-//		return nil, err
-//	}
-//	err = json.Unmarshal(j, i)
-//	if err != nil {
-//		return nil, err
-//	}
-//	return i, err
-//}
