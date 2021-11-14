@@ -29,7 +29,7 @@ func run() (map[string]interface{}, error) {
 	ctx := context.Background()
 	event := events.APIGatewayProxyRequest{
 		Resource: "/api",
-		Path:     "/api/article/list",
+		Path:     "/api/article",
 		Headers: map[string]string{
 			"Host":      "example.com",
 			"x-api-key": "abc",
@@ -40,7 +40,7 @@ func run() (map[string]interface{}, error) {
 	}
 
 	article := object.Article{
-		ID:              1,
+		ID:              111,
 		Title:           "example",
 		SubTitle:        "example",
 		ImageURL:        "example",
@@ -57,8 +57,7 @@ func run() (map[string]interface{}, error) {
 	}
 	event.Body = j
 
-	//httpMethods := []string{"GET", "POST", "PUT", "DELETE"}
-	httpMethods := []string{"GET"}
+	httpMethods := []string{"POST", "PUT", "GET", "DELETE"}
 	result := make(map[string]interface{}, len(httpMethods))
 	for _, httpMethod := range httpMethods {
 		event.HTTPMethod = httpMethod
