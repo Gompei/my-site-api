@@ -2,10 +2,6 @@
 
 MAKEFILE_DIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
-local:
-	docker-compose build
-	docker-compose up -d
-
 build:
 	GOOS=linux GOARCH=amd64 go build -o handler
 	zip lambda.zip handler
