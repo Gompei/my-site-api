@@ -62,6 +62,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			id := request.PathParameters["articleID"]
 			err = repository.DeleteArticle(ctx, id)
 			result = "Success Physical DELETE Article Data"
+			articles = nil
 		default:
 			return events.APIGatewayProxyResponse{
 				Headers:    headers,
@@ -85,6 +86,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			}
 			err = repository.PutArticle(ctx, article)
 			result = "Success POST・PUT Article Data"
+			articles = nil
 		case "DELETE":
 			var article *object.Article
 			if article, err = object.ToArticleStruct(request.Body); err != nil {
@@ -93,6 +95,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			article.DeleteFlg = true
 			err = repository.PutArticle(ctx, article)
 			result = "Success Logic DELETE Article Data"
+			articles = nil
 		default:
 			return events.APIGatewayProxyResponse{
 				Headers:    headers,
