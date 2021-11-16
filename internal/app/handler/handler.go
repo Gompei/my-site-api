@@ -2,8 +2,10 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
+	"sort"
 
 	"github.com/Gompei/my-site-api/internal/app/dao"
 	"github.com/Gompei/my-site-api/pkg"
@@ -47,6 +49,13 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				if articles, err = repository.ListArticles(ctx); err != nil {
 					break
 				}
+
+				// 登録日基準で降順に安定ソート
+				sort.SliceStable(articles, func(i, j int) bool {
+					return pkg.StringToTime(articles[i].CreateTimeStamp).After(pkg.StringToTime(articles[j].CreateTimeStamp))
+				})
+
+				fmt.Println(articles)
 			}
 			result, err = pkg.InterfaceToJson(articles)
 		default:

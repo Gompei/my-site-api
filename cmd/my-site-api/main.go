@@ -17,15 +17,19 @@ func main() {
 	if strings.HasPrefix(os.Getenv("AWS_EXECUTION_ENV"), "AWS_Lambda") {
 		lambda.Start(handler.Handler)
 	} else {
-		response, err := run()
+		// Article CRUD API
+		response, err := runArticleAPI()
 		if err != nil {
 			log.Fatalf("ERROR handler %v\n", err)
 		}
 		log.Printf("INFO handler %v\n", response)
+
+		// Article List API
+		response, err = runArticleListAPI()
 	}
 }
 
-func run() (map[string]interface{}, error) {
+func runArticleAPI() (map[string]interface{}, error) {
 	ctx := context.Background()
 	event := events.APIGatewayProxyRequest{
 		Resource: "/api",
@@ -69,4 +73,8 @@ func run() (map[string]interface{}, error) {
 	}
 
 	return result, nil
+}
+
+func runArticleListAPI() (map[string]interface{}, error) {
+	return nil, nil
 }

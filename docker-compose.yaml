@@ -8,6 +8,8 @@ services:
     command: -jar DynamoDBLocal.jar -sharedDb -dbPath /data
     volumes:
       - dynamodb-data:/data
+    networks:
+      - my-site-api
     ports:
       - "8000:8000"
 
@@ -18,8 +20,26 @@ services:
       - DYNAMO_ENDPOINT=dynamodb:8000
     ports:
       - "8001:8001"
+    networks:
+      - my-site-api
+    depends_on:
+      - dynamodb
+
+  aws-cli:
+    container_name: aws-cli
+    build:
+      context: ./build/aws-cli
+      dockerfile: ./Dockerfile
+    working_dir: /work/my-site-api
+    command: "chmod +x /work/my-site-api/init.sh"
+    tty: true
+    networks:
+      - my-site-api
     depends_on:
       - dynamodb
 
 volumes:
   dynamodb-data:
+
+networks:
+  my-site-api:
