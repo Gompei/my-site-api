@@ -8,7 +8,7 @@ aws dynamodb create-table \
   --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
   --endpoint-url "$DYNAMODB_ENDPOINT" > /dev/null 2>&1
 
-#: put test data
+: put test data
 for id in $(seq 100)
 do
   DATE=$(date --date "$id days ago" '+%Y-%m-%dT%H:%M:%S%z')
