@@ -1,22 +1,19 @@
 #!/usr/bin/env bash
 
-DYNAMODB_ENDPOINT="http://localhost:8000"
-DYNAMODB_TABLE_NAME="article_table"
-
 : create dynamodb table
 aws dynamodb create-table \
   --table-name "$DYNAMODB_TABLE_NAME" \
   --attribute-definitions AttributeName=id,AttributeType=N \
   --key-schema AttributeName=id,KeyType=HASH \
   --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
-  --endpoint-url "$DYNAMODB_ENDPOINT"
+  --endpoint-url "$DYNAMODB_ENDPOINT" > /dev/null 2>&1
 
-: put test data
-for i in $(seq 100)
+#: put test data
+for id in $(seq 100)
 do
-  DATE=$(date -v-"$i"d '+%Y-%m-%dT%H:%M:%S%z')
+  DATE=$(date --date "$id days ago" '+%Y-%m-%dT%H:%M:%S%z')
   aws dynamodb put-item  \
     --table-name "$DYNAMODB_TABLE_NAME" \
-    --item "{\"id\": $(i),\"title\": \"example\",\"sub_title\": \"example\",\"image_url\": \"example\",\"category_tag\": \"example\",\"description\": \"example\",\"content\": \"example\",\"create_time_stamp\": $(DATE),\"update_time_stamp\": $(DATE)}" \
-    --endpoint-url "$DYNAMODB_ENDPOINT"
+    --endpoint-url "$DYNAMODB_ENDPOINT" \
+    --item "{ \"id\": { \"N\": \"$id\"},\"create_time_stamp\": {\"S\": \"$DATE\"},\"update_time_stamp\": {\"S\": \"$DATE\"},\"title\": {\"S\": \"example\"},\"sub_title\": { \"S\": \"example\"},\"image_url\": {\"S\": \"example\"},\"category_tag\": {\"S\": \"example\"},\"description\": {\"S\": \"example\"},\"content\": {\"S\": \"example\"}}"
 done

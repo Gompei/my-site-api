@@ -17,7 +17,7 @@ services:
     container_name: dynamodb-admin
     image: aaronshaf/dynamodb-admin:latest
     environment:
-      - DYNAMO_ENDPOINT=dynamodb:8000
+      DYNAMO_ENDPOINT: "dynamodb:8000"
     ports:
       - "8001:8001"
     networks:
@@ -31,8 +31,18 @@ services:
       context: ./build/aws-cli
       dockerfile: ./Dockerfile
     working_dir: /work/my-site-api
-    command: "chmod +x /work/my-site-api/init.sh"
+    command: ./init.sh
+    environment:
+      # ローカルのみでしか使用しない為、アクセス情報については適当
+      AWS_ACCESS_KEY_ID: "example_access_key"
+      AWS_SECRET_ACCESS_KEY: "example_secret_access_key"
+      AWS_DEFAULT_REGION: "ap-northeast-1"
+      AWS_DEFAULT_OUTPUT: "json"
+      DYNAMODB_ENDPOINT: "http://dynamodb:8000"
+      DYNAMODB_TABLE_NAME: "article_table"
     tty: true
+    volumes:
+      - "./build/aws-cli/init.sh:/work/my-site-api/init.sh"
     networks:
       - my-site-api
     depends_on:
