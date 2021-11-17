@@ -17,18 +17,23 @@ func main() {
 	if strings.HasPrefix(os.Getenv("AWS_EXECUTION_ENV"), "AWS_Lambda") {
 		lambda.Start(handler.Handler)
 	} else {
-		// Article CRUD API
-		response, err := runArticleAPI()
-		if err != nil {
-			log.Fatalf("ERROR handler %v\n", err)
+		callAPIs := []func() (map[string]interface{}, error){
+			runArticleAPI,
+			runArticleListAPI,
+			runArticlePhysicalDeleteAPI,
 		}
-		log.Printf("INFO handler %v\n", response)
 
-		// Article List API
-		response, err = runArticleListAPI()
+		for _, api := range callAPIs {
+			response, err := api()
+			if err != nil {
+				log.Fatalf("ERROR %v\n", err)
+			}
+			log.Printf("INFO %v\n", response)
+		}
 	}
 }
 
+// Article CRUD API
 func runArticleAPI() (map[string]interface{}, error) {
 	ctx := context.Background()
 	event := events.APIGatewayProxyRequest{
@@ -39,12 +44,12 @@ func runArticleAPI() (map[string]interface{}, error) {
 			"x-api-key": "abc",
 		},
 		PathParameters: map[string]string{
-			"articleID": "111",
+			"articleID": "101",
 		},
 	}
 
 	article := object.Article{
-		ID:              111,
+		ID:              101,
 		Title:           "example",
 		SubTitle:        "example",
 		ImageURL:        "example",
@@ -53,6 +58,7 @@ func runArticleAPI() (map[string]interface{}, error) {
 		Content:         "example",
 		CreateTimeStamp: pkg.CreateTimeStamp(),
 		UpdateTimeStamp: pkg.CreateTimeStamp(),
+		PublicFlg:       false,
 		DeleteFlg:       false,
 	}
 	j, err := pkg.InterfaceToJson(article)
@@ -75,6 +81,57 @@ func runArticleAPI() (map[string]interface{}, error) {
 	return result, nil
 }
 
+// Article List API
 func runArticleListAPI() (map[string]interface{}, error) {
-	return nil, nil
+	ctx := context.Background()
+	event := events.APIGatewayProxyRequest{
+		Resource: "/api/article/list",
+		Path:     "/api/article/list",
+		Headers: map[string]string{
+			"Host":      "example.com",
+			"x-api-key": "abc",
+		},
+	}
+
+	httpMethods := []string{"GET"}
+	result := make(map[string]interface{}, len(httpMethods))
+	for _, httpMethod := range httpMethods {
+		event.HTTPMethod = httpMethod
+		response, err := handler.Handler(ctx, event)
+		if err != nil {
+			return nil, err
+		}
+		result[httpMethod] = response
+	}
+
+	return result, nil
+}
+
+// Article Physical Delete API
+func runArticlePhysicalDeleteAPI() (map[string]interface{}, error) {
+	ctx := context.Background()
+	event := events.APIGatewayProxyRequest{
+		Resource: "/api/article/physical-delete",
+		Path:     "/api/article/physical-delete",
+		Headers: map[string]string{
+			"Host":      "example.com",
+			"x-api-key": "abc",
+		},
+		PathParameters: map[string]string{
+			"articleID": "101",
+		},
+	}
+
+	httpMethods := []string{"DELETE"}
+	result := make(map[string]interface{}, len(httpMethods))
+	for _, httpMethod := range httpMethods {
+		event.HTTPMethod = httpMethod
+		response, err := handler.Handler(ctx, event)
+		if err != nil {
+			return nil, err
+		}
+		result[httpMethod] = response
+	}
+
+	return result, nil
 }

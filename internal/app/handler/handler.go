@@ -2,15 +2,13 @@ package handler
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"sort"
 
 	"github.com/Gompei/my-site-api/internal/app/dao"
-	"github.com/Gompei/my-site-api/pkg"
-
 	"github.com/Gompei/my-site-api/internal/app/domain/object"
+	"github.com/Gompei/my-site-api/pkg"
 	"github.com/aws/aws-lambda-go/events"
 )
 
@@ -54,8 +52,6 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				sort.SliceStable(articles, func(i, j int) bool {
 					return pkg.StringToTime(articles[i].CreateTimeStamp).After(pkg.StringToTime(articles[j].CreateTimeStamp))
 				})
-
-				fmt.Println(articles)
 			}
 			result, err = pkg.InterfaceToJson(articles)
 		default:
