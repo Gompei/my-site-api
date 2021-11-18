@@ -53,7 +53,10 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 					return pkg.StringToTime(articles[i].CreateTimeStamp).After(pkg.StringToTime(articles[j].CreateTimeStamp))
 				})
 			}
-			result, err = pkg.InterfaceToJson(articles)
+
+			// TODO:入力値チェックをAPI Gateway側で実施
+			page := pkg.StringToInt(request.QueryStringParameters["p"])
+			result, err = pkg.InterfaceToJson(articles[:page])
 		default:
 			return events.APIGatewayProxyResponse{
 				Headers:    headers,

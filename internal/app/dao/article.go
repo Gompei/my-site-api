@@ -25,6 +25,9 @@ func NewArticle(db *dynamodb.DynamoDB) repository.Article {
 }
 
 // ListArticles　記事データを全件取得します
+// 本来であればパーティションキー・ソートキーを組み合わせた検索・取得制限を実施するべきだが、
+// パーティションキーを記事ID(一意)にしているため、上記の実装に修正しても内部的な処理(計算量)は同じになってしまうと考えている。(今後調査)
+// よって、データ量も多くないため全件返すように実装している。(ハンドラ関数内でデータを加工)
 func (r *Article) ListArticles(ctx context.Context) ([]*object.Article, error) {
 	scanOut, err := r.db.ScanWithContext(ctx, &dynamodb.ScanInput{
 		TableName:            aws.String(tableName),
