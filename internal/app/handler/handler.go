@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"sort"
@@ -87,22 +88,18 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				break
 			}
 			result, err = pkg.InterfaceToJson(article)
-		case "POST", "PUT":
+		case "POST", "PUT", "DELETE":
 			var article *object.Article
 			if article, err = object.ToArticleStruct(request.Body); err != nil {
 				break
 			}
-			err = repository.PutArticle(ctx, article)
-			result = "Success POST・PUT Article Data"
-			articles = nil
-		case "DELETE":
-			var article *object.Article
-			if article, err = object.ToArticleStruct(request.Body); err != nil {
-				break
+
+			if request.HTTPMethod == "DELETE" {
+				article.DeleteFlg = true
 			}
-			article.DeleteFlg = true
+
 			err = repository.PutArticle(ctx, article)
-			result = "Success Logic DELETE Article Data"
+			result = fmt.Sprintf("Success %s Article Data", request.HTTPMethod)
 			articles = nil
 		default:
 			return events.APIGatewayProxyResponse{
