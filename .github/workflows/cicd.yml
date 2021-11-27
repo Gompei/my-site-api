@@ -1,0 +1,66 @@
+name: 'ci-cd'
+
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - main
+      - master
+
+jobs:
+  ci:
+    name: ci
+    strategy:
+      matrix:
+        go-version: [1.16.x]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: latest
+
+      - name: Get dependencies
+        run: go get -v -t -d ./...
+
+      - name: testing
+        run: go test -v ./...
+  cd:
+    name: cd
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Build
+        run: GOOS=linux GOARCH=amd64 go build -o handler
+
+      - name: Compress to zip
+        run: |
+          apt-get install zip
+          zip lambda.zip handler
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{secrets.AWS_IAM_TO_ASSUME}}
+          role-session-name: my-site-api-github-actions-session
+
+      - name: Upload S3 zip file
+        run: aws s3 cp lambda.zip s3://gompei-lambda-management-bucket-us-east-1/my-site/lambda.zip
+
+      - name: Deploy lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name my-site-api \
+            --s3-bucket gompei-lambda-management-bucket-us-east-1 \
+            --s3-key my-site/lambda.zip
