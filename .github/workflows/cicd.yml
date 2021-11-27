@@ -41,7 +41,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: Build
-        run: GOOS=linux GOARCH=amd64 go build -o handler
+        run: GOOS=linux GOARCH=amd64 go build -o handler ./cmd/my-site-api/main.go
 
       - name: Compress to zip
         run: |
