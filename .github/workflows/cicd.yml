@@ -45,7 +45,7 @@ jobs:
 
       - name: Compress to zip
         run: |
-          apt-get install zip
+          sudo apt-get install zip
           zip lambda.zip handler
 
       - name: Configure AWS Credentials
