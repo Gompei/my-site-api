@@ -39,15 +39,15 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	repository := d.Article()
 
 	switch request.Path {
-	case "/api/test":
+	case "/test":
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusOK,
 			Headers:    headers,
 			Body:       fmt.Sprintln("Hello World!!"),
 		}, nil
-	case "/api/article/search":
-		log.Println("/api/article/search unimplemented")
-	case "/api/article/list":
+	case "/article/search":
+		log.Println("/article/search unimplemented")
+	case "/article/list":
 		switch request.HTTPMethod {
 		case "GET":
 			if articles == nil {
@@ -71,7 +71,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				StatusCode: http.StatusNotImplemented,
 			}, nil
 		}
-	case "/api/article/physical-delete":
+	case "/article/physical-delete":
 		switch request.HTTPMethod {
 		case "DELETE":
 			id := request.PathParameters["articleID"]
@@ -85,7 +85,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				StatusCode: http.StatusNotImplemented,
 			}, nil
 		}
-	case "/api/article":
+	case "/article":
 		switch request.HTTPMethod {
 		case "GET":
 			id := request.PathParameters["articleID"]
@@ -114,6 +114,12 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				StatusCode: http.StatusNotImplemented,
 			}, nil
 		}
+	default:
+		return events.APIGatewayProxyResponse{
+			Headers:    headers,
+			Body:       "Not Found",
+			StatusCode: http.StatusNotFound,
+		}, nil
 	}
 
 	if err != nil {
