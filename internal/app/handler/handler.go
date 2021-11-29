@@ -39,6 +39,12 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	repository := d.Article()
 
 	switch request.Path {
+	case "/api/test":
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusOK,
+			Headers:    headers,
+			Body:       fmt.Sprintln("Hello World!!"),
+		}, nil
 	case "/api/article/search":
 		log.Println("/api/article/search unimplemented")
 	case "/api/article/list":
