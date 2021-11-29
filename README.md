@@ -1,6 +1,6 @@
 # my-site-api
 
-[![ci](https://github.com/Gompei/my-site-api/actions/workflows/ci.yml/badge.svg)](https://github.com/Gompei/my-site-api/actions/workflows/ci.yml)
+[![ci/cd](https://github.com/Gompei/my-site-api/actions/workflows/cicd.yml/badge.svg)](https://github.com/Gompei/my-site-api/actions/workflows/cicd.yml)
 
 ## リポジトリ概要
 
@@ -16,7 +16,7 @@
 
 |  エンドポイント  |  概要  | HTTPメソッド |
 | ---- | ---- | ---- |
-|  /api/article/search  |  全文検索APIにリクエスト(未実装)  | GET |
-|  /api/article/list  | 見出し用記事データを件数分取得  | GET |
-|  /api/article/physical-delete  |  記事データの物理削除  | DELETE |
-|  /api/article  |  記事データのCRUD処理  | GET,POST,PUT,DELETE |
+|  /article/search  |  全文検索APIにリクエスト(未実装)  | GET |
+|  /article/list  | 見出し用記事データを件数分取得  | GET |
+|  /article/physical-delete  |  記事データの物理削除  | DELETE |
+|  /article  |  記事データのCRUD処理  | GET,POST,PUT,DELETE |
