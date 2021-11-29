@@ -10,7 +10,12 @@ import (
 )
 
 func NewDynamo() (*dynamodb.DynamoDB, error) {
-	disableSSLFlg, err := strconv.ParseBool(os.Getenv("DISABLE_SSL_FLG"))
+	sslFlg := os.Getenv("DISABLE_SSL_FLG")
+	if sslFlg == "" {
+		sslFlg = "true"
+	}
+
+	disableSSLFlg, err := strconv.ParseBool(sslFlg)
 	if err != nil {
 		return nil, err
 	}
@@ -20,14 +25,9 @@ func NewDynamo() (*dynamodb.DynamoDB, error) {
 		region = "us-east-1"
 	}
 
-	endpoint := os.Getenv("ENDPOINT")
-	if endpoint == "" {
-		endpoint = "http://127.0.0.1:8000"
-	}
-
 	return dynamodb.New(session.Must(session.NewSession(&aws.Config{
 		Region:     aws.String(region),
-		Endpoint:   aws.String(endpoint),
+		Endpoint:   aws.String(os.Getenv("ENDPOINT")),
 		DisableSSL: aws.Bool(disableSSLFlg),
 	}))), nil
 }
