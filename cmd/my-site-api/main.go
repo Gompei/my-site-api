@@ -53,7 +53,7 @@ func runArticleAPI() (map[string]interface{}, error) {
 		Title:           "example",
 		SubTitle:        "example",
 		ImageURL:        "example",
-		CategoryTag:     "example",
+		CategoryTag:     []string{"example"},
 		Description:     "example",
 		Content:         "example",
 		CreateTimeStamp: pkg.CreateTimeStamp(),

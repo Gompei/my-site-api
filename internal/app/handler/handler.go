@@ -61,8 +61,6 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				})
 			}
 
-			// TODO:入力値チェックをAPI Gateway側で実施
-			//page := pkg.StringToInt(request.QueryStringParameters["p"])
 			result, err = pkg.InterfaceToJson(articles)
 		default:
 			return events.APIGatewayProxyResponse{
