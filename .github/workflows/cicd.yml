@@ -56,11 +56,11 @@ jobs:
           role-session-name: my-site-api-github-actions-session
 
       - name: Upload S3 zip file
-        run: aws s3 cp lambda.zip s3://gompei-lambda-management-bucket-us-east-1/my-site/lambda.zip
+        run: aws s3 cp lambda.zip s3://gompei-lambda-management-bucket-ap-northeast-1/my-site/lambda.zip
 
       - name: Deploy lambda
         run: |
           aws lambda update-function-code \
             --function-name my-site-api \
-            --s3-bucket gompei-lambda-management-bucket-us-east-1 \
+            --s3-bucket gompei-lambda-management-bucket-ap-northeast-1 \
             --s3-key my-site/lambda.zip
