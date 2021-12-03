@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"sort"
+	"strconv"
 
 	"github.com/Gompei/my-site-api/internal/app/dao"
 	"github.com/Gompei/my-site-api/internal/app/domain/object"
@@ -69,41 +70,49 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				StatusCode: http.StatusNotImplemented,
 			}, nil
 		}
-	case "/article/physical-delete":
-		switch request.HTTPMethod {
-		case "DELETE":
-			id := request.PathParameters["articleID"]
-			err = repository.DeleteArticle(ctx, id)
-			result = "Success Physical DELETE Article Data"
-			articles = nil
-		default:
-			return events.APIGatewayProxyResponse{
-				Headers:    headers,
-				Body:       "Not Implemented",
-				StatusCode: http.StatusNotImplemented,
-			}, nil
-		}
 	case "/article":
 		switch request.HTTPMethod {
 		case "GET":
-			id := request.PathParameters["articleID"]
+			_, err := strconv.Atoi(request.PathParameters["articleID"])
+			if err != nil {
+				break
+			}
+
 			var article *object.Article
-			if article, err = repository.GetArticle(ctx, id); err != nil {
+			if article, err = repository.GetArticle(ctx, request.PathParameters["articleID"]); err != nil {
 				break
 			}
 			result, err = pkg.InterfaceToJson(article)
-		case "POST", "PUT", "DELETE":
+		case "POST", "PUT":
 			var article *object.Article
 			if article, err = object.ToArticleStruct(request.Body); err != nil {
 				break
 			}
 
-			if request.HTTPMethod == "DELETE" {
-				article.DeleteFlg = true
-			}
-
 			err = repository.PutArticle(ctx, article)
 			result = fmt.Sprintf("Success %s Article Data", request.HTTPMethod)
+			articles = nil
+		case "DELETE":
+			_, err := strconv.Atoi(request.PathParameters["articleID"])
+			if err != nil {
+				break
+			}
+
+			if request.QueryStringParameters["physical"] == "true" && request.PathParameters["articleID"] != "" {
+				if err = repository.DeleteArticle(ctx, request.PathParameters["articleID"]); err != nil {
+					break
+				}
+				result = "Success Physical Delete Article Data"
+			} else {
+				var article *object.Article
+				if article, err = object.ToArticleStruct(request.Body); err != nil {
+					break
+				}
+				article.DeleteFlg = true
+				err = repository.PutArticle(ctx, article)
+				result = "Success Delete Article Data"
+			}
+
 			articles = nil
 		default:
 			return events.APIGatewayProxyResponse{
