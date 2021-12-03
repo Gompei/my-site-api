@@ -73,8 +73,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	case "/article":
 		switch request.HTTPMethod {
 		case "GET":
-			_, err := strconv.Atoi(request.PathParameters["articleID"])
-			if err != nil {
+			if _, err = strconv.Atoi(request.PathParameters["articleID"]); err != nil {
 				break
 			}
 
@@ -93,8 +92,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			result = fmt.Sprintf("Success %s Article Data", request.HTTPMethod)
 			articles = nil
 		case "DELETE":
-			_, err := strconv.Atoi(request.PathParameters["articleID"])
-			if err != nil {
+			if _, err = strconv.Atoi(request.PathParameters["articleID"]); err != nil {
 				break
 			}
 
