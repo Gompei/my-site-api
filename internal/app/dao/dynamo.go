@@ -12,7 +12,7 @@ import (
 func NewDynamo() (*dynamodb.DynamoDB, error) {
 	sslFlg := os.Getenv("DISABLE_SSL_FLG")
 	if sslFlg == "" {
-		sslFlg = "true"
+		sslFlg = "false"
 	}
 
 	disableSSLFlg, err := strconv.ParseBool(sslFlg)
@@ -22,7 +22,7 @@ func NewDynamo() (*dynamodb.DynamoDB, error) {
 
 	region := os.Getenv("REGION")
 	if region == "" {
-		region = "us-east-1"
+		region = "ap-northeast-1"
 	}
 
 	return dynamodb.New(session.Must(session.NewSession(&aws.Config{

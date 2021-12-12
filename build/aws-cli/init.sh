@@ -24,14 +24,14 @@ do
   DATE=$(date --date "$id days ago" '+%Y-%m-%d')
   echo $DATE
   aws dynamodb put-item  \
-    --region us-east-1 \
+    --region ap-northeast-1 \
     --table-name "$DYNAMODB_TABLE_NAME" \
     --endpoint-url "$DYNAMODB_ENDPOINT" \
     --item "{ \"id\": { \"N\": \"$id\"},\"create_time_stamp\": {\"S\": \"$DATE\"},\"update_time_stamp\": {\"S\": \"$DATE\"},\"title\": {\"S\": \"example\"},\"sub_title\": { \"S\": \"example\"},\"image_url\": {\"S\": \"example\"},\"category_tag\": {\"S\": \"example\"},\"description\": {\"S\": \"example\"},\"content\": {\"S\": \"example\"}}"
 done
 
 aws dynamodb put-item  \
-    --region us-east-1 \
+    --region ap-northeast-1 \
     --table-name "$DYNAMODB_COUNT_TABLE_NAME" \
     --endpoint-url "$DYNAMODB_ENDPOINT" \
     --item "{ \"name\": { \"S\": \"article_count_id\"},\"id\": {\"N\": \"10\"}}"
