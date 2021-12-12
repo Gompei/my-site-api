@@ -30,7 +30,7 @@ func init() {
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	headers := map[string]string{
 		"Content-Type":                 "application/json",
-		"Access-Control-Allow-Origin":  "http://localhost",
+		"Access-Control-Allow-Origin":  "http://localhost:8080",
 		"Access-Control-Allow-Methods": "GET,PUT,DELETE,OPTIONS",
 		"Access-Control-Allow-Headers": "Content-Type",
 	}
