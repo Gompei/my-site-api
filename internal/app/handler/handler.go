@@ -46,8 +46,10 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			Headers:    headers,
 			Body:       fmt.Sprintln("Hello World!!"),
 		}, nil
+
 	case "/article/search":
 		log.Println("/article/search unimplemented")
+
 	case "/article/list":
 		switch request.HTTPMethod {
 		case "GET":
@@ -70,7 +72,41 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				StatusCode: http.StatusNotImplemented,
 			}, nil
 		}
+
 	case "/article":
+		switch request.HTTPMethod {
+		case "PUT":
+			var article *object.Article
+			if article, err = object.ToArticleStruct(request.Body); err != nil {
+				break
+			}
+
+			// TODO
+			article.ID, err = repository.GetCountID(ctx)
+			if err != nil {
+				break
+			}
+			article.ID++
+			err = repository.PutArticle(ctx, article)
+			if err != nil {
+				break
+			}
+			err = repository.PutCountID(ctx, article.ID)
+			if err != nil {
+				break
+			}
+
+			result = "Success PUT Article Data"
+			articles = nil
+		default:
+			return events.APIGatewayProxyResponse{
+				Headers:    headers,
+				Body:       "Not Implemented",
+				StatusCode: http.StatusNotImplemented,
+			}, nil
+		}
+
+	default:
 		switch request.HTTPMethod {
 		case "GET":
 			if _, err = strconv.Atoi(request.PathParameters["articleID"]); err != nil {
@@ -82,15 +118,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				break
 			}
 			result, err = pkg.InterfaceToJson(article)
-		case "POST", "PUT":
-			var article *object.Article
-			if article, err = object.ToArticleStruct(request.Body); err != nil {
-				break
-			}
 
-			err = repository.PutArticle(ctx, article)
-			result = fmt.Sprintf("Success %s Article Data", request.HTTPMethod)
-			articles = nil
 		case "DELETE":
 			if _, err = strconv.Atoi(request.PathParameters["articleID"]); err != nil {
 				break
@@ -110,21 +138,15 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				err = repository.PutArticle(ctx, article)
 				result = "Success Delete Article Data"
 			}
-
 			articles = nil
+
 		default:
 			return events.APIGatewayProxyResponse{
 				Headers:    headers,
-				Body:       "Not Implemented",
-				StatusCode: http.StatusNotImplemented,
+				Body:       "Not Found",
+				StatusCode: http.StatusNotFound,
 			}, nil
 		}
-	default:
-		return events.APIGatewayProxyResponse{
-			Headers:    headers,
-			Body:       "Not Found",
-			StatusCode: http.StatusNotFound,
-		}, nil
 	}
 
 	if err != nil {

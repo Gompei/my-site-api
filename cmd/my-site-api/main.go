@@ -20,7 +20,6 @@ func main() {
 		callAPIs := []func() (map[string]interface{}, error){
 			runArticleAPI,
 			runArticleListAPI,
-			runArticlePhysicalDeleteAPI,
 		}
 
 		for _, api := range callAPIs {
@@ -37,8 +36,7 @@ func main() {
 func runArticleAPI() (map[string]interface{}, error) {
 	ctx := context.Background()
 	event := events.APIGatewayProxyRequest{
-		Resource: "/api",
-		Path:     "/api/article",
+		Path: "/article",
 		Headers: map[string]string{
 			"Host":      "example.com",
 			"x-api-key": "abc",
@@ -54,7 +52,6 @@ func runArticleAPI() (map[string]interface{}, error) {
 		SubTitle:        "example",
 		ImageURL:        "example",
 		CategoryTag:     []string{"example"},
-		Description:     "example",
 		Content:         "example",
 		CreateTimeStamp: pkg.CreateTimeStamp(),
 		UpdateTimeStamp: pkg.CreateTimeStamp(),
@@ -67,9 +64,13 @@ func runArticleAPI() (map[string]interface{}, error) {
 	}
 	event.Body = j
 
-	httpMethods := []string{"POST", "PUT", "GET", "DELETE"}
+	httpMethods := []string{"PUT", "GET", "DELETE"}
 	result := make(map[string]interface{}, len(httpMethods))
 	for _, httpMethod := range httpMethods {
+		if httpMethod != "PUT" && event.Path != event.Path+event.PathParameters["articleID"] {
+			event.Path = event.Path + event.PathParameters["articleID"]
+		}
+
 		event.HTTPMethod = httpMethod
 		response, err := handler.Handler(ctx, event)
 		if err != nil {
@@ -85,8 +86,8 @@ func runArticleAPI() (map[string]interface{}, error) {
 func runArticleListAPI() (map[string]interface{}, error) {
 	ctx := context.Background()
 	event := events.APIGatewayProxyRequest{
-		Resource: "/api/article/list",
-		Path:     "/api/article/list",
+		Resource: "/article/list",
+		Path:     "/article/list",
 		Headers: map[string]string{
 			"Host":      "example.com",
 			"x-api-key": "abc",
@@ -94,35 +95,6 @@ func runArticleListAPI() (map[string]interface{}, error) {
 	}
 
 	httpMethods := []string{"GET"}
-	result := make(map[string]interface{}, len(httpMethods))
-	for _, httpMethod := range httpMethods {
-		event.HTTPMethod = httpMethod
-		response, err := handler.Handler(ctx, event)
-		if err != nil {
-			return nil, err
-		}
-		result[httpMethod] = response
-	}
-
-	return result, nil
-}
-
-// Article Physical Delete API
-func runArticlePhysicalDeleteAPI() (map[string]interface{}, error) {
-	ctx := context.Background()
-	event := events.APIGatewayProxyRequest{
-		Resource: "/api/article/physical-delete",
-		Path:     "/api/article/physical-delete",
-		Headers: map[string]string{
-			"Host":      "example.com",
-			"x-api-key": "abc",
-		},
-		PathParameters: map[string]string{
-			"articleID": "101",
-		},
-	}
-
-	httpMethods := []string{"DELETE"}
 	result := make(map[string]interface{}, len(httpMethods))
 	for _, httpMethod := range httpMethods {
 		event.HTTPMethod = httpMethod

@@ -6,9 +6,9 @@ DYNAMODB_TABLE_NAME="article_table"
 for id in $(seq 10)
 do
   # Mac
-  DATE=$(date -v-"$id"d '+%Y-%m-%dT%H:%M:%S%z')
+  DATE=$(date -v-"$id"d '+%Y-%m-%d')
   # Linux
-  # DATE=$(date --date "$id days ago" '+%Y-%m-%dT%H:%M:%S%z')
+  # DATE=$(date --date "$id days ago" '+%Y-%m-%d')
   aws dynamodb put-item  \
     --region us-east-1 \
     --table-name "$DYNAMODB_TABLE_NAME" \
