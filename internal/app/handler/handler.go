@@ -157,6 +157,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 
 	return events.APIGatewayProxyResponse{
 		Body:       result,
+		Headers:    headers,
 		StatusCode: http.StatusOK,
 	}, nil
 }
