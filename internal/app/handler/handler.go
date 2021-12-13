@@ -115,6 +115,12 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			var article *object.Article
 			if article, err = repository.GetArticle(ctx, request.PathParameters["articleID"]); err != nil {
 				break
+			} else if article.ID == 0 {
+				return events.APIGatewayProxyResponse{
+					Body:       "Not Found",
+					Headers:    headers,
+					StatusCode: http.StatusNotFound,
+				}, nil
 			}
 			result, err = pkg.InterfaceToJson(article)
 
