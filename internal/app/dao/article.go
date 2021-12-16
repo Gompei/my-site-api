@@ -12,7 +12,6 @@ import (
 
 const (
 	tableName                = "article_table"
-	countTableName           = "article_count_table"
 	partitionKey             = "id"
 	listProjectionExpression = "id,title,sub_title,image_url,category_tag,description,create_time_stamp,update_time_stamp,public_flg,delete_flg"
 )
@@ -69,80 +68,4 @@ func (r *Article) GetArticle(ctx context.Context, id string) (*object.Article, e
 	err = dynamodbattribute.UnmarshalMap(result.Item, &article)
 
 	return article, err
-}
-
-// PutArticle　記事データを登録・更新します
-func (r *Article) PutArticle(ctx context.Context, article *object.Article) error {
-	av, err := dynamodbattribute.MarshalMap(article)
-	if err != nil {
-		return err
-	}
-
-	_, err = r.db.PutItemWithContext(ctx, &dynamodb.PutItemInput{
-		TableName: aws.String(tableName),
-		Item:      av,
-
-		ReturnConsumedCapacity:      aws.String("NONE"),
-		ReturnItemCollectionMetrics: aws.String("NONE"),
-		ReturnValues:                aws.String("NONE"),
-	})
-
-	return err
-}
-
-// DeleteArticle　記事IDを元に、記事データを削除します(物理削除)
-func (r *Article) DeleteArticle(ctx context.Context, id string) error {
-	_, err := r.db.DeleteItemWithContext(ctx, &dynamodb.DeleteItemInput{
-		TableName: aws.String(tableName),
-		Key: map[string]*dynamodb.AttributeValue{
-			partitionKey: {
-				N: aws.String(id),
-			},
-		},
-
-		ReturnConsumedCapacity:      aws.String("NONE"),
-		ReturnItemCollectionMetrics: aws.String("NONE"),
-		ReturnValues:                aws.String("NONE"),
-	})
-
-	return err
-}
-
-func (r *Article) GetCountID(ctx context.Context) (int64, error) {
-	result, err := r.db.GetItemWithContext(ctx, &dynamodb.GetItemInput{
-		TableName: aws.String(countTableName),
-		Key: map[string]*dynamodb.AttributeValue{
-			"name": {
-				S: aws.String("article_count_id"),
-			},
-		},
-	})
-	if err != nil {
-		return 0, err
-	}
-
-	var count *object.CountArticleTable
-	err = dynamodbattribute.UnmarshalMap(result.Item, &count)
-	return count.Id, err
-}
-
-func (r *Article) PutCountID(ctx context.Context, id int64) error {
-	av, err := dynamodbattribute.MarshalMap(&object.CountArticleTable{
-		Name: "article_count_id",
-		Id:   id,
-	})
-	if err != nil {
-		return err
-	}
-
-	_, err = r.db.PutItemWithContext(ctx, &dynamodb.PutItemInput{
-		TableName: aws.String(countTableName),
-		Item:      av,
-
-		ReturnConsumedCapacity:      aws.String("NONE"),
-		ReturnItemCollectionMetrics: aws.String("NONE"),
-		ReturnValues:                aws.String("NONE"),
-	})
-
-	return err
 }

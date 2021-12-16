@@ -72,39 +72,6 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			}, nil
 		}
 
-	case "/article":
-		switch request.HTTPMethod {
-		case "PUT":
-			var article *object.Article
-			if article, err = object.ToArticleStruct(request.Body); err != nil {
-				break
-			}
-
-			// TODO
-			article.ID, err = repository.GetCountID(ctx)
-			if err != nil {
-				break
-			}
-			article.ID++
-			err = repository.PutArticle(ctx, article)
-			if err != nil {
-				break
-			}
-			err = repository.PutCountID(ctx, article.ID)
-			if err != nil {
-				break
-			}
-
-			result = "Success PUT Article Data"
-			articles = nil
-		default:
-			return events.APIGatewayProxyResponse{
-				Headers:    headers,
-				Body:       "Not Implemented",
-				StatusCode: http.StatusNotImplemented,
-			}, nil
-		}
-
 	default:
 		switch request.HTTPMethod {
 		case "GET":
@@ -123,27 +90,6 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				}, nil
 			}
 			result, err = pkg.InterfaceToJson(article)
-
-		case "DELETE":
-			if _, err = strconv.Atoi(request.PathParameters["articleID"]); err != nil {
-				break
-			}
-
-			if request.QueryStringParameters["physical"] == "true" && request.PathParameters["articleID"] != "" {
-				if err = repository.DeleteArticle(ctx, request.PathParameters["articleID"]); err != nil {
-					break
-				}
-				result = "Success Physical Delete Article Data"
-			} else {
-				var article *object.Article
-				if article, err = object.ToArticleStruct(request.Body); err != nil {
-					break
-				}
-				article.DeleteFlg = true
-				err = repository.PutArticle(ctx, article)
-				result = "Success Delete Article Data"
-			}
-			articles = nil
 
 		default:
 			return events.APIGatewayProxyResponse{

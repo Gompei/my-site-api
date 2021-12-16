@@ -64,13 +64,9 @@ func runArticleAPI() (map[string]interface{}, error) {
 	}
 	event.Body = j
 
-	httpMethods := []string{"PUT", "GET", "DELETE"}
+	httpMethods := []string{"GET"}
 	result := make(map[string]interface{}, len(httpMethods))
 	for _, httpMethod := range httpMethods {
-		if httpMethod != "PUT" && event.Path != event.Path+event.PathParameters["articleID"] {
-			event.Path = event.Path + event.PathParameters["articleID"]
-		}
-
 		event.HTTPMethod = httpMethod
 		response, err := handler.Handler(ctx, event)
 		if err != nil {

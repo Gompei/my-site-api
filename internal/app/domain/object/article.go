@@ -1,7 +1,5 @@
 package object
 
-import "encoding/json"
-
 type Article struct {
 	ID              int64    `dynamodbav:"id" json:"id,omitempty"`
 	Title           string   `dynamodbav:"title" json:"title,omitempty"`
@@ -13,18 +11,4 @@ type Article struct {
 	UpdateTimeStamp string   `dynamodbav:"update_time_stamp" json:"update_time_stamp,omitempty"`
 	PublicFlg       bool     `dynamodbav:"public_flg" json:"public_flg,omitempty"`
 	DeleteFlg       bool     `dynamodbav:"delete_flg" json:"delete_flg,omitempty"`
-}
-
-type CountArticleTable struct {
-	Name string `dynamodbav:"name"`
-	Id   int64  `dynamodbav:"id"`
-}
-
-func ToArticleStruct(str string) (*Article, error) {
-	var article Article
-	err := json.Unmarshal([]byte(str), &article)
-	if err != nil {
-		return nil, err
-	}
-	return &article, nil
 }
