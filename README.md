@@ -19,7 +19,7 @@
 |  /test  |  API疎通用  | GET |
 |  /article/search  |  全文検索APIにリクエスト(未実装)  | GET |
 |  /article/list  | 見出し用記事データを件数分取得  | GET |
-|  /article  |  記事データのCRUD処理  | GET,POST,PUT,DELETE |
+|  /article  |  記事データ取得 | GET |
 
 ## その他
 
