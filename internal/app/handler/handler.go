@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"sort"
@@ -39,16 +38,6 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	repository := d.Article()
 
 	switch request.Path {
-	case "/test":
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusOK,
-			Headers:    headers,
-			Body:       fmt.Sprintln("Hello World!!"),
-		}, nil
-
-	case "/article/search":
-		log.Println("/article/search unimplemented")
-
 	case "/article/list":
 		switch request.HTTPMethod {
 		case "GET":
@@ -64,12 +53,6 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			}
 
 			result, err = pkg.InterfaceToJson(articles)
-		default:
-			return events.APIGatewayProxyResponse{
-				Headers:    headers,
-				Body:       "Not Implemented",
-				StatusCode: http.StatusNotImplemented,
-			}, nil
 		}
 
 	default:
@@ -90,13 +73,6 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				}, nil
 			}
 			result, err = pkg.InterfaceToJson(article)
-
-		default:
-			return events.APIGatewayProxyResponse{
-				Headers:    headers,
-				Body:       "Not Found",
-				StatusCode: http.StatusNotFound,
-			}, nil
 		}
 	}
 

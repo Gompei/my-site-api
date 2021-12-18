@@ -55,8 +55,6 @@ func runArticleAPI() (map[string]interface{}, error) {
 		Content:         "example",
 		CreateTimeStamp: pkg.CreateTimeStamp(),
 		UpdateTimeStamp: pkg.CreateTimeStamp(),
-		PublicFlg:       false,
-		DeleteFlg:       false,
 	}
 	j, err := pkg.InterfaceToJson(article)
 	if err != nil {

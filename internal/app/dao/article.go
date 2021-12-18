@@ -13,7 +13,7 @@ import (
 const (
 	tableName                = "article_table"
 	partitionKey             = "id"
-	listProjectionExpression = "id,title,sub_title,image_url,category_tag,description,create_time_stamp,update_time_stamp,public_flg,delete_flg"
+	listProjectionExpression = "id,title,sub_title,image_url,category_tag,description,create_time_stamp,update_time_stamp"
 )
 
 type Article struct {
