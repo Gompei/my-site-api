@@ -30,7 +30,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	headers := map[string]string{
 		"Content-Type":                 "application/json",
 		"Access-Control-Allow-Origin":  "http://localhost:8080",
-		"Access-Control-Allow-Methods": "GET,PUT,DELETE,OPTIONS",
+		"Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
 		"Access-Control-Allow-Headers": "Content-Type",
 	}
 
@@ -54,12 +54,17 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 
 			result, err = pkg.InterfaceToJson(articles)
 		}
-
 	default:
 		switch request.HTTPMethod {
 		case "GET":
 			if _, err = strconv.Atoi(request.PathParameters["articleID"]); err != nil {
 				break
+			} else if request.PathParameters["articleID"] == "" {
+				return events.APIGatewayProxyResponse{
+					Body:       "Not Found",
+					Headers:    headers,
+					StatusCode: http.StatusNotFound,
+				}, nil
 			}
 
 			var article *object.Article
@@ -79,6 +84,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusInternalServerError,
+			Headers:    headers,
 			Body:       err.Error(),
 		}, err
 	}
