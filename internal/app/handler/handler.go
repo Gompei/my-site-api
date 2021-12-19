@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"sort"
-	"strconv"
 
 	"github.com/Gompei/my-site-api/internal/app/dao"
 	"github.com/Gompei/my-site-api/internal/app/domain/object"
@@ -47,7 +46,6 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				}
 
 				if len(articles) == 0 {
-					result = "Not Article Data"
 					break
 				}
 
@@ -64,17 +62,22 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		case "GET":
 			articleID := request.PathParameters["articleID"]
 			if articleID == "" || articleID == "0" {
-				break
-			}
-			if _, err = strconv.Atoi(articleID); err != nil {
-				break
+				return events.APIGatewayProxyResponse{
+					Body:       "Not Article Data",
+					Headers:    headers,
+					StatusCode: http.StatusNotFound,
+				}, nil
 			}
 
 			var article *object.Article
 			if article, err = repository.GetArticle(ctx, articleID); err != nil {
 				break
 			} else if article.ID == 0 {
-				break
+				return events.APIGatewayProxyResponse{
+					Body:       "Not Article Data",
+					Headers:    headers,
+					StatusCode: http.StatusNotFound,
+				}, nil
 			}
 
 			result, err = pkg.InterfaceToJson(article)
@@ -87,14 +90,6 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			Headers:    headers,
 			Body:       err.Error(),
 		}, err
-	}
-
-	if result == "" {
-		return events.APIGatewayProxyResponse{
-			Body:       "Not Article Data",
-			Headers:    headers,
-			StatusCode: http.StatusNotFound,
-		}, nil
 	}
 
 	return events.APIGatewayProxyResponse{
