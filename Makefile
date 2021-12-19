@@ -10,5 +10,5 @@ build:
 deploy: build
 	aws lambda update-function-code \
 		--function-name my-site-api \
-		--region us-east-1 \
+		--region ap-northeast-1 \
 		--zip-file fileb://$(MAKEFILE_DIR)/lambda.zip
