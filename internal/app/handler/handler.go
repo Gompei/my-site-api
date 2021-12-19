@@ -47,6 +47,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				}
 
 				if len(articles) == 0 {
+					result = "Not Article Data"
 					break
 				}
 
@@ -62,7 +63,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		switch request.HTTPMethod {
 		case "GET":
 			articleID := request.PathParameters["articleID"]
-			if articleID == "0" || articleID == "" {
+			if articleID == "" || articleID == "0" {
 				break
 			}
 			if _, err = strconv.Atoi(articleID); err != nil {
