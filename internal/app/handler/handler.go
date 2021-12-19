@@ -30,7 +30,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	headers := map[string]string{
 		"Content-Type":                 "application/json",
 		"Access-Control-Allow-Origin":  "http://localhost:8080",
-		"Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+		"Access-Control-Allow-Methods": "GET,OPTIONS",
 		"Access-Control-Allow-Headers": "Content-Type",
 	}
 
@@ -46,6 +46,10 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 					break
 				}
 
+				if len(articles) == 0 {
+					break
+				}
+
 				// 登録日基準で降順に安定ソート
 				sort.SliceStable(articles, func(i, j int) bool {
 					return pkg.StringToTime(articles[i].CreateTimeStamp).After(pkg.StringToTime(articles[j].CreateTimeStamp))
@@ -57,26 +61,21 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	default:
 		switch request.HTTPMethod {
 		case "GET":
-			if _, err = strconv.Atoi(request.PathParameters["articleID"]); err != nil {
+			articleID := request.PathParameters["articleID"]
+			if articleID == "0" || articleID == "" {
 				break
-			} else if request.PathParameters["articleID"] == "" {
-				return events.APIGatewayProxyResponse{
-					Body:       "Not Found",
-					Headers:    headers,
-					StatusCode: http.StatusNotFound,
-				}, nil
+			}
+			if _, err = strconv.Atoi(articleID); err != nil {
+				break
 			}
 
 			var article *object.Article
-			if article, err = repository.GetArticle(ctx, request.PathParameters["articleID"]); err != nil {
+			if article, err = repository.GetArticle(ctx, articleID); err != nil {
 				break
 			} else if article.ID == 0 {
-				return events.APIGatewayProxyResponse{
-					Body:       "Not Found",
-					Headers:    headers,
-					StatusCode: http.StatusNotFound,
-				}, nil
+				break
 			}
+
 			result, err = pkg.InterfaceToJson(article)
 		}
 	}
@@ -87,6 +86,14 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			Headers:    headers,
 			Body:       err.Error(),
 		}, err
+	}
+
+	if result == "" {
+		return events.APIGatewayProxyResponse{
+			Body:       "Not Article Data",
+			Headers:    headers,
+			StatusCode: http.StatusNotFound,
+		}, nil
 	}
 
 	return events.APIGatewayProxyResponse{
