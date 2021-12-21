@@ -13,9 +13,8 @@ import (
 )
 
 var (
-	d        dao.Dao
-	err      error
-	articles []*object.Article
+	d   dao.Dao
+	err error
 )
 
 func init() {
@@ -39,20 +38,19 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	case "/article/list":
 		switch request.HTTPMethod {
 		case "GET":
-			if articles == nil {
-				if articles, err = repository.ListArticles(ctx); err != nil {
-					break
-				}
-
-				if len(articles) == 0 {
-					break
-				}
-
-				// 登録日基準で降順に安定ソート
-				sort.SliceStable(articles, func(i, j int) bool {
-					return pkg.StringToTime(articles[i].CreateTimeStamp).After(pkg.StringToTime(articles[j].CreateTimeStamp))
-				})
+			var articles []*object.Article
+			if articles, err = repository.ListArticles(ctx); err != nil {
+				break
 			}
+
+			if len(articles) == 0 {
+				break
+			}
+
+			// 登録日基準で降順に安定ソート
+			sort.SliceStable(articles, func(i, j int) bool {
+				return pkg.StringToTime(articles[i].CreateTimeStamp).After(pkg.StringToTime(articles[j].CreateTimeStamp))
+			})
 
 			result, err = pkg.InterfaceToJson(articles)
 		}
